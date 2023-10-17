@@ -7,7 +7,7 @@ pub(crate) mod shorthand;
 
 fn main() {
     if let Ok(repo) = Repository::open_from_env() {
-        shorthand(repo.head().as_ref());
         changes_index_and_worktree(&repo);
+        shorthand(repo.head());
     };
 }
