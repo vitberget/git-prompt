@@ -1,4 +1,3 @@
-Warning: Unknown configuration option `max_witdh`
 use git2::{Repository, Status, StatusEntry, StatusOptions};
 
 struct RepoChanges {
