@@ -3,13 +3,17 @@ use git2::{Error, Reference, Branch};
 pub(crate) fn shorthand(head: Result<Reference<'_>, Error>) {
     const UNKNOWN: &str = "?";
 
-    if let Ok(reference) = head {
-        let shorthand = reference.shorthand().unwrap_or(UNKNOWN);
-        println!("export GIT_PROMPT_BRANCH={shorthand}");
+    let shorthand = if let Ok(reference) = &head {
+        reference.shorthand().unwrap_or(UNKNOWN)
+    } else {
+        UNKNOWN
+    };
+    println!("export GIT_PROMPT_BRANCH={shorthand}");
 
+
+    let remote = if let Ok(reference) = head {
         let branch = Branch::wrap(reference);
-
-        let remote = if let Ok(upstream) = branch.upstream() {
+        if let Ok(upstream) = branch.upstream() {
             if branch.get().target() == upstream.get().target() {
                 "same"
             } else {
@@ -17,11 +21,9 @@ pub(crate) fn shorthand(head: Result<Reference<'_>, Error>) {
             }
         } else {
             "not_a_branch"
-        };
-
-        println!("export GIT_PROMPT_REMOTE={remote}");
-
+        }
     } else {
-        println!("export GIT_PROMPT_BRANCH={UNKNOWN}");
-    }
+        UNKNOWN
+    };
+    println!("export GIT_PROMPT_BRANCH={remote}");
 }
