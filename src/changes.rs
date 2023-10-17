@@ -12,48 +12,53 @@ impl RepoChanges {
             worktree: false,
         }
     }
+
+    fn both_true(&self) -> bool {
+        self.worktree && self.index
+    }
 }
 
 pub(crate) fn changes_index_and_worktree(repo: &Repository) {
-    let mut repo_changes = RepoChanges::new();
-
     let mut status_options = StatusOptions::new();
     status_options.include_untracked(true);
 
-    repo.statuses(Some(&mut status_options))
+    let repo_changes = repo.statuses(Some(&mut status_options))
         .iter()
-        .for_each(|statuses| {
-            statuses
-                .iter()
-                .filter(|entry| entry.status() != Status::CURRENT)
-                .for_each(|entry| {
-                    update_repo_changes(&mut repo_changes, &entry);
-
-                    if repo_changes.index && repo_changes.worktree {
-                        export_true_false(&repo_changes);
-                        return;
-                    }
-                });
+        .fold(RepoChanges::new(), |acc, statuses| {
+            if acc.both_true() {
+                acc
+            } else {
+                statuses.iter()
+                    .filter(|entry| entry.status() != Status::CURRENT)
+                    .fold(acc, |acc, entry| update_repo_changes(acc, entry))
+            }
         });
+
     export_true_false(&repo_changes);
 }
 
-fn update_repo_changes(repo_changes: &mut RepoChanges, entry: &StatusEntry<'_>) {
-    let status = entry.status();
+fn update_repo_changes(repo_changes: RepoChanges, entry: StatusEntry<'_>) -> RepoChanges {
+    if repo_changes.both_true() {
+        repo_changes
+    } else {
+        let status = entry.status();
 
-    repo_changes.index = repo_changes.index
-        || status.contains(Status::INDEX_DELETED)
-        || status.contains(Status::INDEX_MODIFIED)
-        || status.contains(Status::INDEX_NEW)
-        || status.contains(Status::INDEX_RENAMED)
-        || status.contains(Status::INDEX_TYPECHANGE);
+        let index = repo_changes.index
+            || status.contains(Status::INDEX_DELETED)
+            || status.contains(Status::INDEX_MODIFIED)
+            || status.contains(Status::INDEX_NEW)
+            || status.contains(Status::INDEX_RENAMED)
+            || status.contains(Status::INDEX_TYPECHANGE);
 
-    repo_changes.worktree = repo_changes.worktree
-        || status.contains(Status::WT_DELETED)
-        || status.contains(Status::WT_MODIFIED)
-        || status.contains(Status::WT_NEW)
-        || status.contains(Status::WT_RENAMED)
-        || status.contains(Status::WT_TYPECHANGE);
+        let worktree = repo_changes.worktree
+            || status.contains(Status::WT_DELETED)
+            || status.contains(Status::WT_MODIFIED)
+            || status.contains(Status::WT_NEW)
+            || status.contains(Status::WT_RENAMED)
+            || status.contains(Status::WT_TYPECHANGE);
+
+        RepoChanges { index, worktree }
+    }  
 }
 
 fn export_true_false(repo_changes: &RepoChanges) {

@@ -7,12 +7,10 @@ pub(crate) fn shorthand(head: Result<Reference<'_>, Error>) {
         let shorthand = reference.shorthand().unwrap_or(UNKNOWN);
         println!("export GIT_PROMPT_BRANCH={shorthand}");
 
-
         let branch = Branch::wrap(reference);
-        let local_target = branch.get().target();
 
         let remote = if let Ok(upstream) = branch.upstream() {
-            if local_target == upstream.get().target() {
+            if branch.get().target() == upstream.get().target() {
                 "same"
             } else {
                 "different"
