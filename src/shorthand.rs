@@ -25,5 +25,5 @@ pub(crate) fn shorthand(head: Result<Reference<'_>, Error>) {
     } else {
         UNKNOWN
     };
-    println!("export GIT_PROMPT_BRANCH={remote}");
+    println!("export GIT_PROMPT_REMOTE={remote}");
 }
