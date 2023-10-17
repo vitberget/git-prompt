@@ -10,13 +10,17 @@ pub(crate) fn shorthand(head: Result<Reference<'_>, Error>) {
 
         let branch = Branch::wrap(reference);
         let local_target = branch.get().target();
-        let remote_target = branch.upstream().unwrap().get().target();
 
-        let remote = if local_target == remote_target {
-            "same"
+        let remote = if let Ok(upstream) = branch.upstream() {
+            if local_target == upstream.get().target() {
+                "same"
+            } else {
+                "different"
+            }
         } else {
-            "different"
+            "not_a_branch"
         };
+
         println!("export GIT_PROMPT_REMOTE={remote}");
 
     } else {
