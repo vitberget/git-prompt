@@ -1,15 +1,13 @@
-use crate::branch::branch;
-use crate::summary::changed_index_and_worktree;
+use crate::changes::changes_index_and_worktree;
+use crate::shorthand::shorthand;
 use git2::Repository;
 
-pub(crate) mod branch;
-pub(crate) mod summary;
+pub(crate) mod changes;
+pub(crate) mod shorthand;
 
 fn main() {
     if let Ok(repo) = Repository::open_from_env() {
-        if let Ok(active_branch) = repo.head() {
-            branch(&active_branch);
-        }
-        changed_index_and_worktree(&repo);
+        shorthand(repo.head().as_ref());
+        changes_index_and_worktree(&repo);
     };
 }

@@ -1,3 +1,4 @@
+Warning: Unknown configuration option `max_witdh`
 use git2::{Repository, Status, StatusEntry, StatusOptions};
 
 struct RepoChanges {
@@ -14,7 +15,7 @@ impl RepoChanges {
     }
 }
 
-pub(crate) fn changed_index_and_worktree(repo: &Repository) {
+pub(crate) fn changes_index_and_worktree(repo: &Repository) {
     let mut repo_changes = RepoChanges::new();
 
     let mut status_options = StatusOptions::new();
