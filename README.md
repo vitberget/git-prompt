@@ -16,6 +16,7 @@ Git prompt gives output like output:
 export GIT_PROMPT_BRANCH=main
 export GIT_PROMPT_INDEX_CHANGED=false
 export GIT_PROMPT_WORKTREE_CHANGED=false
+export GIT_PROMPT_REMOTE=different
 ```
 
 To use it in Bash/Zsh/other:
