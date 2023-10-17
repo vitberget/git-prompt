@@ -1,4 +1,4 @@
-use git2::{Repository, Status, StatusEntry, StatusOptions};
+use git2::{Repository, Status, StatusEntry, StatusOptions, Statuses};
 
 struct RepoChanges {
     index: bool,
@@ -29,18 +29,21 @@ pub(crate) fn changes_index_and_worktree(repo: &Repository) {
 
     repo.statuses(Some(&mut status_options))
         .iter()
-        .fold(RepoChanges::new(), |acc, statuses| {
-            if acc.both_true() {
-                acc
-            } else {
-                statuses.iter()
-                    .filter(|entry| entry.status() != Status::CURRENT)
-                    .fold(acc, |acc, entry| update_repo_changes(acc, entry))
-            }
-        }).export_true_false();
+        .fold(RepoChanges::new(), update_repo_changes)
+        .export_true_false();
 }
 
-fn update_repo_changes(repo_changes: RepoChanges, entry: StatusEntry<'_>) -> RepoChanges {
+fn update_repo_changes(repo_changes: RepoChanges, statuses :&Statuses<'_>) -> RepoChanges {
+    if repo_changes.both_true() {
+        repo_changes
+    } else {
+        statuses.iter()
+            .filter(|entry| entry.status() != Status::CURRENT)
+            .fold(repo_changes, update_repo_changes_from_status_entry)
+    }
+}
+
+fn update_repo_changes_from_status_entry(repo_changes: RepoChanges, entry: StatusEntry<'_>) -> RepoChanges {
     if repo_changes.both_true() {
         repo_changes
     } else {
