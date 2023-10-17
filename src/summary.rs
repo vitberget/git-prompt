@@ -1,4 +1,4 @@
-use git2::{Repository, Status, StatusOptions, StatusEntry};
+use git2::{Repository, Status, StatusEntry, StatusOptions};
 
 struct RepoChanges {
     index: bool,
@@ -7,7 +7,10 @@ struct RepoChanges {
 
 impl RepoChanges {
     fn new() -> RepoChanges {
-        RepoChanges { index: false , worktree: false }
+        RepoChanges {
+            index: false,
+            worktree: false,
+        }
     }
 }
 
@@ -17,10 +20,12 @@ pub(crate) fn changed_index_and_worktree(repo: &Repository) {
     let mut status_options = StatusOptions::new();
     status_options.include_untracked(true);
 
-    repo.statuses(Some(&mut status_options)).iter()
+    repo.statuses(Some(&mut status_options))
+        .iter()
         .for_each(|statuses| {
-            statuses.iter()
-                .filter(|entry| entry.status() != Status::CURRENT) 
+            statuses
+                .iter()
+                .filter(|entry| entry.status() != Status::CURRENT)
                 .for_each(|entry| {
                     update_repo_changes(&mut repo_changes, &entry);
 
@@ -51,7 +56,7 @@ fn update_repo_changes(repo_changes: &mut RepoChanges, entry: &StatusEntry<'_>) 
         || status.contains(Status::WT_TYPECHANGE);
 }
 
-fn export_true_false(cc: &RepoChanges) {
-    println!("export GIT_PROMPT_INDEX_CHANGED={}", cc.index);
-    println!("export GIT_PROMPT_WORKTREE_CHANGED={}", cc.worktree);
+fn export_true_false(repo_changes: &RepoChanges) {
+    println!("export GIT_PROMPT_INDEX_CHANGED={}", repo_changes.index);
+    println!("export GIT_PROMPT_WORKTREE_CHANGED={}", repo_changes.worktree);
 }
