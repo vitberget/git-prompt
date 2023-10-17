@@ -31,7 +31,11 @@ eval $(git-prompt)
 function git-prompt-prompt() {
     eval $(git-prompt)
     if [[ ! -z "$GIT_PROMPT_BRANCH" ]]; then
-        echo -n " %F{249}\uE0A0%{[94m%}${GIT_PROMPT_BRANCH} "
+        if [[ "$GIT_PROMPT_REMOTE" == "same" ]]; then
+            echo -n "%F{249}\uE0A0${GIT_PROMPT_BRANCH}"
+        else
+            echo -n "%F{160}\uE0A0%F{249}${GIT_PROMPT_BRANCH}"
+        fi
         if [[ "$GIT_PROMPT_INDEX_CHANGED" == "true" ]]; then
             echo -n "%F{red}✗"
         else
@@ -42,6 +46,7 @@ function git-prompt-prompt() {
         else
             echo -n "%F{green}✓"
         fi
+        echo " "
     fi
 }
 ```
