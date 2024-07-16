@@ -1,17 +1,9 @@
 use git2::{Repository, Status, StatusEntry, StatusOptions, Statuses};
 
+#[derive(Default)]
 struct RepoChanges {
     index: bool,
     worktree: bool,
-}
-
-impl Default for RepoChanges {
-    fn default() -> Self {
-        Self { 
-            index: false,
-            worktree: false
-        }
-    }
 }
 
 impl RepoChanges {
