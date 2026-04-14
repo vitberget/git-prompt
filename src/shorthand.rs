@@ -16,6 +16,7 @@ pub(crate) fn remote(head: Result<Reference<'_>, Error>) {
         Ok(reference) => branch_equaliness(reference),
         Err(_) => UNKNOWN,
     };
+
     println!("export GIT_PROMPT_REMOTE={remote}");
 }
 

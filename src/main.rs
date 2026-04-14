@@ -1,7 +1,7 @@
+use git2::Repository;
+
 use crate::changes::changes_index_and_worktree;
 use crate::shorthand::{shorthand, remote};
-
-use git2::Repository;
 
 pub(crate) mod changes;
 pub(crate) mod shorthand;
